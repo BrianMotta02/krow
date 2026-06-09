@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, Image, Alert, KeyboardAvoidingView,
+  StyleSheet, Alert, KeyboardAvoidingView,
   Platform, ScrollView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -20,18 +20,23 @@ export default function Login() {
     }
     const ok = login(email, password);
     if (ok) {
-      router.replace('/(tabs)');
+      router.replace('../(tabs)');
     } else {
       Alert.alert('Erro', 'E-mail ou senha inválidos.');
     }
   }
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={styles.logoArea}>
           <View style={styles.logoBox}>
-            {/* Substitua pelo seu asset real: <Image source={require('../../assets/logo.png')} style={styles.logoImg} /> */}
             <Text style={styles.logoChar}>K</Text>
           </View>
           <Text style={styles.logoText}>KROW</Text>
@@ -78,7 +83,10 @@ export default function Login() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f2f3f7' },
-  scroll: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 28, paddingVertical: 40 },
+  scroll: {
+    flexGrow: 1, justifyContent: 'center',
+    paddingHorizontal: 28, paddingVertical: 40,
+  },
   logoArea: { alignItems: 'center', marginBottom: 32 },
   logoBox: {
     width: 72, height: 72, borderRadius: 18,
@@ -87,12 +95,20 @@ const styles = StyleSheet.create({
   },
   logoChar: { color: '#fff', fontSize: 32, fontWeight: '900' },
   logoText: { fontSize: 22, fontWeight: '900', letterSpacing: 4, color: '#1a2540' },
-  welcome: { fontSize: 26, fontWeight: '900', color: '#1a2540', textAlign: 'center', marginBottom: 28 },
-  input: {
-    backgroundColor: '#fff', borderRadius: 10, borderWidth: 1.5, borderColor: '#dde0ea',
-    paddingHorizontal: 16, paddingVertical: 13, fontSize: 14, color: '#1a2540', marginBottom: 12,
+  welcome: {
+    fontSize: 26, fontWeight: '900', color: '#1a2540',
+    textAlign: 'center', marginBottom: 28,
   },
-  forgotLink: { color: '#2e7de1', fontWeight: '700', fontSize: 13, textAlign: 'right', marginBottom: 20 },
+  input: {
+    backgroundColor: '#fff', borderRadius: 10,
+    borderWidth: 1.5, borderColor: '#dde0ea',
+    paddingHorizontal: 16, paddingVertical: 13,
+    fontSize: 14, color: '#1a2540', marginBottom: 12,
+  },
+  forgotLink: {
+    color: '#2e7de1', fontWeight: '700', fontSize: 13,
+    textAlign: 'right', marginBottom: 20,
+  },
   btnPrimary: {
     backgroundColor: '#1e5fc2', borderRadius: 10,
     paddingVertical: 15, alignItems: 'center', marginBottom: 16,
