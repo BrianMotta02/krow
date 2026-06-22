@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, ScrollView, SafeAreaView,
+  StyleSheet, ScrollView, SafeAreaView, Modal,
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { useAuth } from '../../context/AuthContext';
@@ -59,6 +59,7 @@ export default function Home() {
   const { projects } = useProjects();
   const { getRecentTasks } = useTasks();
   const [search, setSearch] = useState('');
+  const [modalVerTodos, setModalVerTodos] = useState(false);
 
   const firstName = user?.name?.split(' ')[0] ?? 'usuário';
   const recentTasks = getRecentTasks(3);
@@ -86,7 +87,7 @@ export default function Home() {
           </TouchableOpacity>
         </View>
 
-        {/* Saudação */}
+        {/* Ola */}
         <Text style={styles.greeting}>
           {getGreeting()},{' '}
           <Text style={styles.greetingName}>{firstName}</Text>
@@ -103,12 +104,13 @@ export default function Home() {
           />
         </View>
 
+
         {/* Projetos */}
         <View style={styles.sectionRow}>
           <View style={styles.sectionBadge}>
             <Text style={styles.sectionBadgeText}>visão geral dos projetos:</Text>
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => setModalVerTodos(true)}>
             <Text style={styles.verTodos}>VER TODOS</Text>
           </TouchableOpacity>
         </View>
