@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   Alert,
 } from "react-native";
 import Svg, { Circle } from "react-native-svg";
+import { useLocalSearchParams } from "expo-router";
 import { useProjects } from "../../context/ProjectContext";
 import { maskDate } from "../utils/masks";
 
@@ -60,6 +61,7 @@ function getInitials(name: string) {
 }
 
 export default function Projetos() {
+  const { abrirTodos } = useLocalSearchParams<{ abrirTodos?: string }>();
   const { projects, addProject } = useProjects();
   const [modalVerTodos, setModalVerTodos] = useState(false);
   const [modalAdicionar, setModalAdicionar] = useState(false);
@@ -69,6 +71,12 @@ export default function Projetos() {
   const [dataInicio, setDataInicio] = useState("");
   const [dataEntrega, setDataEntrega] = useState("");
   const [gerente, setGerente] = useState("");
+
+  useEffect(() => {
+    if (abrirTodos) {
+      setModalVerTodos(true);
+    }
+  }, [abrirTodos]);
 
   function handleAddProject() {
     if (!nome || !dataInicio || !dataEntrega || !gerente) {
