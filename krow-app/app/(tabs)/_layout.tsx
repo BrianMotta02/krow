@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Text } from 'react-native';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 export default function TabLayout() {
   return (
@@ -7,14 +8,14 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#fff',
-          borderTopWidth: 1.5,
-          borderTopColor: '#dde0ea',
-          height: 64,
+          backgroundColor: '#e3e4e9',
+          borderTopWidth: 0,
+          height: 75,
           paddingBottom: 8,
+          paddingTop: 8,
         },
-        tabBarActiveTintColor: '#1e5fc2',
-        tabBarInactiveTintColor: '#b0b5c8',
+        tabBarActiveTintColor: '#000',
+        tabBarInactiveTintColor: '#7a8099',
         tabBarLabelStyle: { fontSize: 10, fontWeight: '700' },
       }}
     >
@@ -39,11 +40,12 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>📋</Text>,
         }}
       />
+
       <Tabs.Screen
         name="conta"
         options={{
           title: 'CONTA',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>👤</Text>,
+          tabBarIcon: ({ color }) => <FontAwesome5 name="user-tie" size={20} color={color} />,
         }}
       />
     </Tabs>
