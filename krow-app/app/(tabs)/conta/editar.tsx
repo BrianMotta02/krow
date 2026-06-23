@@ -18,15 +18,14 @@ import * as ImagePicker from 'expo-image-picker';
 import { Ionicons, Feather } from '@expo/vector-icons';
 
 export default function EditarConta() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const router = useRouter();
 
-  // Estados dos inputs. Uso do "(user as any)" para evitar erros do TypeScript
-  const [nome, setNome] = useState(user?.name ?? 'João Pedro V.');
-  const [funcao, setFuncao] = useState((user as any)?.role ?? 'Gerente de projetos');
-  const [email, setEmail] = useState(user?.email ?? 'joao.pedro@krow.com.br');
-  const [fone, setFone] = useState((user as any)?.phone ?? '+5547991557412');
-  const [foto, setFoto] = useState<string | null>((user as any)?.avatar ?? null);
+  const [nome, setNome] = useState(user?.name ?? '');
+  const [funcao, setFuncao] = useState(user?.role ?? '');
+  const [email, setEmail] = useState(user?.email ?? '');
+  const [fone, setFone] = useState(user?.phone ?? '');
+  const [foto, setFoto] = useState<string | null>(user?.avatar ?? null);
 
   async function handleAlterarFoto() {
     try {
@@ -50,6 +49,14 @@ export default function EditarConta() {
       Alert.alert('Atenção', 'Nome e E-mail não podem ficar vazios.');
       return;
     }
+
+    updateUser({
+      name: nome.trim(),
+      role: funcao.trim(),
+      email: email.trim(),
+      phone: fone.trim(),
+      avatar: foto,
+    });
 
     Alert.alert('Sucesso', 'Conta atualizada com sucesso!', [
       { text: 'OK', onPress: () => router.back() }
@@ -82,7 +89,7 @@ export default function EditarConta() {
                   <Image source={{ uri: foto }} style={styles.avatarImage} />
                 ) : (
                   <View style={styles.avatarPlaceholder}>
-                    <Text style={styles.avatarText}>{getInitials(nome || 'JP')}</Text>
+                    <Text style={styles.avatarText}>{getInitials(nome || 'U')}</Text>
                   </View>
                 )}
               </TouchableOpacity>

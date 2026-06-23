@@ -1,6 +1,12 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-type User = { name: string; email: string; phone: string };
+type User = {
+  name: string;
+  email: string;
+  phone: string;
+  role?: string;
+  avatar?: string | null;
+};
 type UserRecord = User & { password: string };
 
 type AuthContextType = {
@@ -8,6 +14,7 @@ type AuthContextType = {
   login: (email: string, password: string) => boolean;
   register: (name: string, email: string, phone: string, password: string) => void;
   logout: () => void;
+  updateUser: (data: Partial<User>) => void;
 };
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -23,7 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   function login(email: string, password: string): boolean {
     const found = users.find(u => u.email === email && u.password === password);
     if (found) {
-      setUser({ name: found.name, email: found.email, phone: found.phone });
+      setUser({ name: found.name, email: found.email, phone: found.phone, role: found.role, avatar: found.avatar });
       return true;
     }
     return false;
@@ -33,8 +40,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }
 
+  function updateUser(data: Partial<User>) {
+    setUser(prev => (prev ? { ...prev, ...data } : prev));
+
+    setUsers(prev =>
+      prev.map(u => (u.email === user?.email ? { ...u, ...data } : u))
+    );
+  }
+
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
