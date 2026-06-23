@@ -4,6 +4,7 @@ import {
   StyleSheet, ScrollView, SafeAreaView,
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
+import { router } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import { useProjects } from '../../context/ProjectContext';
 import { useTasks } from '../../context/TaskContext';
@@ -108,7 +109,14 @@ export default function Home() {
           <View style={styles.sectionBadge}>
             <Text style={styles.sectionBadgeText}>visão geral dos projetos:</Text>
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              router.push({
+                pathname: '/(tabs)/projetos',
+                params: { abrirTodos: Date.now().toString() },
+              })
+            }
+          >
             <Text style={styles.verTodos}>VER TODOS</Text>
           </TouchableOpacity>
         </View>
