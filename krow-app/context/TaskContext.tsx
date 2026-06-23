@@ -144,7 +144,7 @@ const MOCK_TASKS: Task[] = [
       {
         id: "cm5",
         author: "Brian",
-        text: "Atenção ao timeout de 30s no webhook — já deu problema antes.",
+        text: "Atenção ao timeout de 30s no webhook já deu problema antes.",
         createdAt: new Date("2026-06-18"),
       },
       {
