@@ -7,19 +7,7 @@ import Svg, { Circle } from 'react-native-svg';
 import { router } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import { useProjects } from '../../context/ProjectContext';
-import { useTasks } from '../../context/TaskContext';
-
-// ─── Tipo Project ─────────────────────────────────────────────────────────────
-type Project = {
-  id: string;
-  name: string;
-  description?: string;
-  manager: string;
-  startDate: string;
-  endDate: string;
-  progress: number;
-  members: string[];
-};
+import { useTasks, TaskPriority } from '../../context/TaskContext';
 
 // ─── Donut Chart ────────────────────────────────────────────────────────────
 function DonutChart({ percent, size = 90 }: { percent: number; size?: number }) {
@@ -30,10 +18,7 @@ function DonutChart({ percent, size = 90 }: { percent: number; size?: number }) 
 
   return (
     <Svg width={size} height={size}>
-      <Circle
-        cx={size / 2} cy={size / 2} r={radius}
-        stroke="#e0e0e0" strokeWidth={strokeWidth} fill="none"
-      />
+      <Circle cx={size / 2} cy={size / 2} r={radius} stroke="#e0e0e0" strokeWidth={strokeWidth} fill="none" />
       <Circle
         cx={size / 2} cy={size / 2} r={radius}
         stroke="#1a2540" strokeWidth={strokeWidth} fill="none"
@@ -65,7 +50,19 @@ function getDayLabel(date: Date) {
   return `${diff}d atrás`;
 }
 
-// ─── Modal de detalhes do projeto ────────────────────────────────────────────
+// ─── Tipos locais ─────────────────────────────────────────────────────────────
+type Project = {
+  id: string;
+  name: string;
+  description?: string;
+  manager: string;
+  startDate: string;
+  endDate: string;
+  progress: number;
+  members: string[];
+};
+
+// ─── Modal de detalhe de projeto ─────────────────────────────────────────────
 function ProjectDetailModal({
   project,
   visible,
@@ -76,61 +73,55 @@ function ProjectDetailModal({
   onClose: () => void;
 }) {
   if (!project) return null;
-
   return (
     <Modal visible={visible} animationType="fade" transparent>
-      <TouchableOpacity style={detailStyles.overlay} activeOpacity={1} onPress={onClose}>
-        <TouchableOpacity style={detailStyles.card} activeOpacity={1} onPress={() => {}}>
-          <View style={detailStyles.topBar}>
-            <View style={detailStyles.topInfo}>
-              <Text style={detailStyles.projectName}>{project.name}</Text>
-              <Text style={detailStyles.managerLabel}>GP · {project.manager}</Text>
+      <TouchableOpacity style={pStyles.overlay} activeOpacity={1} onPress={onClose}>
+        <TouchableOpacity style={pStyles.card} activeOpacity={1} onPress={() => {}}>
+          <View style={pStyles.topBar}>
+            <View style={pStyles.topInfo}>
+              <Text style={pStyles.projectName}>{project.name}</Text>
+              <Text style={pStyles.managerLabel}>GP · {project.manager}</Text>
             </View>
-            <View style={detailStyles.donutWrap}>
+            <View style={pStyles.donutWrap}>
               <DonutChart percent={project.progress} size={72} />
-              <Text style={detailStyles.donutLabel}>{project.progress}%</Text>
+              <Text style={pStyles.donutLabel}>{project.progress}%</Text>
             </View>
           </View>
-
-          <View style={detailStyles.progressBar}>
-            <View style={[detailStyles.progressFill, { width: `${project.progress}%` }]} />
+          <View style={pStyles.progressBar}>
+            <View style={[pStyles.progressFill, { width: `${project.progress}%` }]} />
           </View>
-          <Text style={detailStyles.progressText}>{project.progress}% concluído</Text>
-
-          <View style={detailStyles.datesRow}>
-            <View style={detailStyles.dateBox}>
-              <Text style={detailStyles.dateLabel}>Início</Text>
-              <Text style={detailStyles.dateValue}>{project.startDate}</Text>
+          <Text style={pStyles.progressText}>{project.progress}% concluído</Text>
+          <View style={pStyles.datesRow}>
+            <View style={pStyles.dateBox}>
+              <Text style={pStyles.dateLabel}>Início</Text>
+              <Text style={pStyles.dateValue}>{project.startDate}</Text>
             </View>
-            <View style={detailStyles.dateDivider} />
-            <View style={detailStyles.dateBox}>
-              <Text style={detailStyles.dateLabel}>Entrega</Text>
-              <Text style={detailStyles.dateValue}>{project.endDate}</Text>
+            <View style={pStyles.dateDivider} />
+            <View style={pStyles.dateBox}>
+              <Text style={pStyles.dateLabel}>Entrega</Text>
+              <Text style={pStyles.dateValue}>{project.endDate}</Text>
             </View>
           </View>
-
           {!!project.description && (
-            <View style={detailStyles.descBox}>
-              <Text style={detailStyles.sectionLabel}>Descrição</Text>
-              <Text style={detailStyles.descText}>{project.description}</Text>
+            <View style={pStyles.descBox}>
+              <Text style={pStyles.sectionLabel}>Descrição</Text>
+              <Text style={pStyles.descText}>{project.description}</Text>
             </View>
           )}
-
           {project.members && project.members.length > 0 && (
-            <View style={detailStyles.membersSection}>
-              <Text style={detailStyles.sectionLabel}>Membros</Text>
-              <View style={detailStyles.membersRow}>
+            <View style={pStyles.membersSection}>
+              <Text style={pStyles.sectionLabel}>Membros</Text>
+              <View style={pStyles.membersRow}>
                 {project.members.map((m, i) => (
-                  <View key={i} style={[detailStyles.memberAvatar, { marginLeft: i > 0 ? -8 : 0 }]}>
-                    <Text style={detailStyles.memberAvatarText}>{getInitials(m)}</Text>
+                  <View key={i} style={[pStyles.memberAvatar, { marginLeft: i > 0 ? -8 : 0 }]}>
+                    <Text style={pStyles.memberAvatarText}>{getInitials(m)}</Text>
                   </View>
                 ))}
               </View>
             </View>
           )}
-
-          <TouchableOpacity style={detailStyles.closeBtn} onPress={onClose}>
-            <Text style={detailStyles.closeBtnText}>Fechar</Text>
+          <TouchableOpacity style={pStyles.closeBtn} onPress={onClose}>
+            <Text style={pStyles.closeBtnText}>Fechar</Text>
           </TouchableOpacity>
         </TouchableOpacity>
       </TouchableOpacity>
@@ -138,24 +129,9 @@ function ProjectDetailModal({
   );
 }
 
-const detailStyles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  card: {
-    width: '100%',
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 20,
-    elevation: 10,
-  },
+const pStyles = StyleSheet.create({
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 },
+  card: { width: '100%', backgroundColor: '#fff', borderRadius: 20, padding: 20, shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 20, elevation: 10 },
   topBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
   topInfo: { flex: 1, paddingRight: 12 },
   projectName: { fontSize: 18, fontWeight: '900', color: '#1a2540', marginBottom: 4 },
@@ -165,14 +141,7 @@ const detailStyles = StyleSheet.create({
   progressBar: { height: 6, backgroundColor: '#e0e0e0', borderRadius: 4, marginBottom: 6 },
   progressFill: { height: 6, backgroundColor: '#2e7de1', borderRadius: 4 },
   progressText: { fontSize: 11, color: '#7a8099', marginBottom: 16 },
-  datesRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f2f3f7',
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 14,
-  },
+  datesRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f2f3f7', borderRadius: 12, padding: 14, marginBottom: 14 },
   dateBox: { flex: 1, alignItems: 'center' },
   dateLabel: { fontSize: 11, color: '#7a8099', marginBottom: 4 },
   dateValue: { fontSize: 14, fontWeight: '800', color: '#1a2540' },
@@ -182,15 +151,182 @@ const detailStyles = StyleSheet.create({
   descText: { fontSize: 13, color: '#1a2540', lineHeight: 19 },
   membersSection: { marginBottom: 14 },
   membersRow: { flexDirection: 'row', marginTop: 8 },
-  memberAvatar: {
-    width: 32, height: 32, borderRadius: 16,
-    backgroundColor: '#1e5fc2',
-    alignItems: 'center', justifyContent: 'center',
-    borderWidth: 2, borderColor: '#fff',
-  },
+  memberAvatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#1e5fc2', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#fff' },
   memberAvatarText: { color: '#fff', fontSize: 11, fontWeight: '800' },
   closeBtn: { backgroundColor: '#1a2540', borderRadius: 10, paddingVertical: 13, alignItems: 'center', marginTop: 4 },
   closeBtnText: { color: '#fff', fontSize: 15, fontWeight: '800' },
+});
+
+// ─── Prioridade (para modal de tarefa) ───────────────────────────────────────
+const PRIORITY_COLORS: Record<TaskPriority, string> = {
+  alta: '#ef4444', media: '#f59e0b', baixa: '#22c55e',
+};
+const PRIORITY_LABELS: Record<TaskPriority, string> = {
+  alta: 'ALTA', media: 'MÉDIA', baixa: 'BAIXA',
+};
+
+function PriorityBadge({ priority }: { priority: TaskPriority }) {
+  return (
+    <View style={[tStyles.priorityBadge, { backgroundColor: PRIORITY_COLORS[priority] + '22', borderColor: PRIORITY_COLORS[priority] }]}>
+      <Text style={[tStyles.priorityText, { color: PRIORITY_COLORS[priority] }]}>● {PRIORITY_LABELS[priority]}</Text>
+    </View>
+  );
+}
+
+// ─── Modal de detalhe de tarefa ───────────────────────────────────────────────
+function TaskDetailModal({
+  taskId,
+  visible,
+  onClose,
+}: {
+  taskId: string | null;
+  visible: boolean;
+  onClose: () => void;
+}) {
+  const { getTask, toggleChecklistItem, addComment, updateStatus, addChecklistItem } = useTasks();
+  const [newComment, setNewComment] = useState('');
+  const [newCheckItem, setNewCheckItem] = useState('');
+
+  const task = taskId ? getTask(taskId) : null;
+  if (!task) return null;
+
+  function handleAddComment() {
+    if (!newComment.trim() || !taskId) return;
+    addComment(taskId, 'Usuário', newComment.trim());
+    setNewComment('');
+  }
+
+  function handleAddCheckItem() {
+    if (!newCheckItem.trim() || !taskId) return;
+    addChecklistItem(taskId, newCheckItem.trim());
+    setNewCheckItem('');
+  }
+
+  return (
+    <Modal visible={visible} animationType="slide" transparent>
+      <View style={tStyles.overlay}>
+        <View style={tStyles.content}>
+          <View style={tStyles.header}>
+            <Text style={tStyles.title} numberOfLines={1}>{task.title}</Text>
+            <TouchableOpacity onPress={onClose}>
+              <Text style={tStyles.closeIcon}>✕</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={tStyles.badgesRow}>
+              <PriorityBadge priority={task.priority} />
+              <View style={tStyles.projectBadge}><Text style={tStyles.projectBadgeText}>{task.projectName}</Text></View>
+              <View style={tStyles.statusBadge}><Text style={tStyles.statusBadgeText}>{task.status.replace('_', ' ').toUpperCase()}</Text></View>
+            </View>
+            <Text style={tStyles.sectionTitle}>DESCRIÇÃO</Text>
+            <Text style={tStyles.descText}>{task.description || 'Sem descrição.'}</Text>
+            <View style={tStyles.infoRow}>
+              <View style={tStyles.infoBox}>
+                <Text style={tStyles.infoLabel}>PRAZO</Text>
+                <Text style={tStyles.infoValue}>📅 {task.deadline}</Text>
+              </View>
+              <View style={tStyles.infoBox}>
+                <Text style={tStyles.infoLabel}>CRIADA EM</Text>
+                <Text style={tStyles.infoValue}>{task.createdAt.toLocaleDateString('pt-BR')}</Text>
+              </View>
+            </View>
+            <Text style={tStyles.sectionTitle}>RESPONSÁVEL</Text>
+            <View style={tStyles.assigneeRow}>
+              <View style={tStyles.assigneeAvatar}>
+                <Text style={tStyles.assigneeAvatarText}>{task.assignedTo.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}</Text>
+              </View>
+              <Text style={tStyles.assigneeName}>{task.assignedTo}</Text>
+            </View>
+            <Text style={tStyles.sectionTitle}>CHECKLIST ({task.checklist.filter(c => c.done).length} de {task.checklist.length} concluídos)</Text>
+            {task.checklist.map(item => (
+              <TouchableOpacity key={item.id} style={tStyles.checkItem} onPress={() => toggleChecklistItem(task.id, item.id)}>
+                <View style={[tStyles.checkbox, item.done && tStyles.checkboxDone]}>
+                  {item.done && <Text style={tStyles.checkmark}>✓</Text>}
+                </View>
+                <Text style={[tStyles.checkText, item.done && tStyles.checkTextDone]}>{item.text}</Text>
+              </TouchableOpacity>
+            ))}
+            <View style={tStyles.addRow}>
+              <TextInput style={[tStyles.input, { flex: 1 }]} placeholder="Novo item..." placeholderTextColor="#b0b5c8" value={newCheckItem} onChangeText={setNewCheckItem} />
+              <TouchableOpacity style={tStyles.addBtn} onPress={handleAddCheckItem}><Text style={tStyles.addBtnText}>+</Text></TouchableOpacity>
+            </View>
+            <Text style={tStyles.sectionTitle}>COMENTÁRIOS ({task.comments.length})</Text>
+            {task.comments.map(c => (
+              <View key={c.id} style={tStyles.commentCard}>
+                <View style={tStyles.commentHeader}>
+                  <View style={tStyles.assigneeAvatar}>
+                    <Text style={tStyles.assigneeAvatarText}>{c.author.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}</Text>
+                  </View>
+                  <View>
+                    <Text style={tStyles.commentAuthor}>{c.author}</Text>
+                    <Text style={tStyles.commentDate}>{c.createdAt.toLocaleDateString('pt-BR')}</Text>
+                  </View>
+                </View>
+                <Text style={tStyles.commentText}>{c.text}</Text>
+              </View>
+            ))}
+            <View style={tStyles.addRow}>
+              <TextInput style={[tStyles.input, { flex: 1 }]} placeholder="Adicionar comentário..." placeholderTextColor="#b0b5c8" value={newComment} onChangeText={setNewComment} />
+              <TouchableOpacity style={tStyles.addBtn} onPress={handleAddComment}><Text style={tStyles.addBtnText}>→</Text></TouchableOpacity>
+            </View>
+            <View style={tStyles.actionsRow}>
+              <TouchableOpacity style={tStyles.btnVoltar} onPress={onClose}>
+                <Text style={tStyles.btnVoltarText}>Voltar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={tStyles.btnConcluir} onPress={() => { updateStatus(task.id, 'concluida'); onClose(); }}>
+                <Text style={tStyles.btnConcluirText}>Marcar concluída</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+const tStyles = StyleSheet.create({
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)' },
+  content: { flex: 1, backgroundColor: '#f2f3f7', marginTop: 48, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20 },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 },
+  title: { fontSize: 16, fontWeight: '900', color: '#1a2540', flex: 1, marginRight: 12 },
+  closeIcon: { fontSize: 18, color: '#555' },
+  badgesRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 },
+  priorityBadge: { borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1 },
+  priorityText: { fontSize: 11, fontWeight: '700' },
+  projectBadge: { backgroundColor: '#2e7de122', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1, borderColor: '#2e7de1' },
+  projectBadgeText: { fontSize: 11, fontWeight: '700', color: '#2e7de1' },
+  statusBadge: { backgroundColor: '#1a254022', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1, borderColor: '#1a2540' },
+  statusBadgeText: { fontSize: 11, fontWeight: '700', color: '#1a2540' },
+  sectionTitle: { fontSize: 11, fontWeight: '900', color: '#7a8099', letterSpacing: 1, marginTop: 20, marginBottom: 10 },
+  descText: { fontSize: 13, color: '#4a5068', lineHeight: 20 },
+  infoRow: { flexDirection: 'row', gap: 12, marginTop: 4 },
+  infoBox: { flex: 1, backgroundColor: '#fff', borderRadius: 10, padding: 12, borderWidth: 1.5, borderColor: '#dde0ea' },
+  infoLabel: { fontSize: 10, color: '#7a8099', fontWeight: '700', marginBottom: 4 },
+  infoValue: { fontSize: 13, color: '#1a2540', fontWeight: '700' },
+  assigneeRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  assigneeAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#1e5fc2', alignItems: 'center', justifyContent: 'center' },
+  assigneeAvatarText: { color: '#fff', fontSize: 12, fontWeight: '800' },
+  assigneeName: { fontSize: 14, fontWeight: '700', color: '#1a2540' },
+  checkItem: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 },
+  checkbox: { width: 20, height: 20, borderRadius: 4, borderWidth: 1.5, borderColor: '#dde0ea', backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
+  checkboxDone: { backgroundColor: '#2e7de1', borderColor: '#2e7de1' },
+  checkmark: { color: '#fff', fontSize: 12, fontWeight: '900' },
+  checkText: { fontSize: 13, color: '#1a2540', flex: 1 },
+  checkTextDone: { textDecorationLine: 'line-through', color: '#b0b5c8' },
+  addRow: { flexDirection: 'row', gap: 8, marginTop: 8, marginBottom: 4 },
+  addBtn: { backgroundColor: '#2e7de1', borderRadius: 10, paddingHorizontal: 16, alignItems: 'center', justifyContent: 'center' },
+  addBtnText: { color: '#fff', fontSize: 18, fontWeight: '700' },
+  commentCard: { backgroundColor: '#fff', borderRadius: 10, padding: 12, marginBottom: 8, borderWidth: 1.5, borderColor: '#dde0ea' },
+  commentHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
+  commentAuthor: { fontSize: 13, fontWeight: '700', color: '#1a2540' },
+  commentDate: { fontSize: 11, color: '#7a8099' },
+  commentText: { fontSize: 13, color: '#4a5068', lineHeight: 18 },
+  actionsRow: { flexDirection: 'row', gap: 12, marginTop: 24, marginBottom: 32 },
+  btnVoltar: { flex: 1, paddingVertical: 13, borderRadius: 10, borderWidth: 1.5, borderColor: '#dde0ea', alignItems: 'center', backgroundColor: '#fff' },
+  btnVoltarText: { fontSize: 14, fontWeight: '700', color: '#1a2540' },
+  btnConcluir: { flex: 1, paddingVertical: 13, borderRadius: 10, backgroundColor: '#2e7de1', alignItems: 'center' },
+  btnConcluirText: { fontSize: 14, fontWeight: '700', color: '#fff' },
+  input: { backgroundColor: '#fff', borderRadius: 10, borderWidth: 1.5, borderColor: '#dde0ea', paddingHorizontal: 16, paddingVertical: 13, fontSize: 14, color: '#1a2540' },
 });
 
 // ─── Tela ───────────────────────────────────────────────────────────────────
@@ -200,6 +336,7 @@ export default function Home() {
   const { getRecentTasks } = useTasks();
   const [search, setSearch] = useState('');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
   const firstName = user?.name?.split(' ')[0] ?? 'usuário';
   const recentTasks = getRecentTasks(3);
@@ -297,7 +434,12 @@ export default function Home() {
         ) : (
           <View style={styles.tasksList}>
             {recentTasks.map(t => (
-              <View key={t.id} style={styles.taskCard}>
+              <TouchableOpacity
+                key={t.id}
+                style={styles.taskCard}
+                onPress={() => setSelectedTaskId(t.id)}
+                activeOpacity={0.75}
+              >
                 <View style={styles.taskAvatar}>
                   <Text style={styles.taskAvatarText}>{getInitials(t.assignedTo)}</Text>
                 </View>
@@ -311,7 +453,7 @@ export default function Home() {
                 ]}>
                   <Text style={styles.taskBadgeText}>{getDayLabel(t.createdAt)}</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))}
           </View>
         )}
@@ -325,10 +467,19 @@ export default function Home() {
         </View>
 
       </ScrollView>
+
+      {/* Modal de projeto */}
       <ProjectDetailModal
         project={selectedProject}
         visible={!!selectedProject}
         onClose={() => setSelectedProject(null)}
+      />
+
+      {/* Modal de tarefa */}
+      <TaskDetailModal
+        taskId={selectedTaskId}
+        visible={!!selectedTaskId}
+        onClose={() => setSelectedTaskId(null)}
       />
     </SafeAreaView>
   );
