@@ -60,11 +60,192 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
+// ─── Tipo Project ─────────────────────────────────────────────────────────────
+type Project = {
+  id: string;
+  name: string;
+  description?: string;
+  manager: string;
+  startDate: string;
+  endDate: string;
+  progress: number;
+  members: string[];
+};
+
+// ─── Modal de detalhes do projeto ────────────────────────────────────────────
+function ProjectDetailModal({
+  project,
+  visible,
+  onClose,
+}: {
+  project: Project | null;
+  visible: boolean;
+  onClose: () => void;
+}) {
+  if (!project) return null;
+
+  return (
+    <Modal visible={visible} animationType="fade" transparent>
+      <TouchableOpacity
+        style={detailStyles.overlay}
+        activeOpacity={1}
+        onPress={onClose}
+      >
+        <TouchableOpacity
+          style={detailStyles.card}
+          activeOpacity={1}
+          onPress={() => {}}
+        >
+          {/* Topo com nome e donut */}
+          <View style={detailStyles.topBar}>
+            <View style={detailStyles.topInfo}>
+              <Text style={detailStyles.projectName}>{project.name}</Text>
+              <Text style={detailStyles.managerLabel}>GP · {project.manager}</Text>
+            </View>
+            <View style={detailStyles.donutWrap}>
+              <DonutChart percent={project.progress} size={72} />
+              <Text style={detailStyles.donutLabel}>{project.progress}%</Text>
+            </View>
+          </View>
+
+          {/* Barra de progresso */}
+          <View style={detailStyles.progressBar}>
+            <View
+              style={[detailStyles.progressFill, { width: `${project.progress}%` }]}
+            />
+          </View>
+          <Text style={detailStyles.progressText}>{project.progress}% concluído</Text>
+
+          {/* Datas */}
+          <View style={detailStyles.datesRow}>
+            <View style={detailStyles.dateBox}>
+              <Text style={detailStyles.dateLabel}>Início</Text>
+              <Text style={detailStyles.dateValue}>{project.startDate}</Text>
+            </View>
+            <View style={detailStyles.dateDivider} />
+            <View style={detailStyles.dateBox}>
+              <Text style={detailStyles.dateLabel}>Entrega</Text>
+              <Text style={detailStyles.dateValue}>{project.endDate}</Text>
+            </View>
+          </View>
+
+          {/* Descrição */}
+          {!!project.description && (
+            <View style={detailStyles.descBox}>
+              <Text style={detailStyles.sectionLabel}>Descrição</Text>
+              <Text style={detailStyles.descText}>{project.description}</Text>
+            </View>
+          )}
+
+          {/* Membros */}
+          {project.members && project.members.length > 0 && (
+            <View style={detailStyles.membersSection}>
+              <Text style={detailStyles.sectionLabel}>Membros</Text>
+              <View style={detailStyles.membersRow}>
+                {project.members.map((m, i) => (
+                  <View
+                    key={i}
+                    style={[detailStyles.memberAvatar, { marginLeft: i > 0 ? -8 : 0 }]}
+                  >
+                    <Text style={detailStyles.memberAvatarText}>{getInitials(m)}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          <TouchableOpacity style={detailStyles.closeBtn} onPress={onClose}>
+            <Text style={detailStyles.closeBtnText}>Fechar</Text>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </TouchableOpacity>
+    </Modal>
+  );
+}
+
+const detailStyles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  card: {
+    width: "100%",
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  topBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 14,
+  },
+  topInfo: { flex: 1, paddingRight: 12 },
+  projectName: { fontSize: 18, fontWeight: "900", color: "#1a2540", marginBottom: 4 },
+  managerLabel: { fontSize: 13, color: "#7a8099" },
+  donutWrap: { position: "relative", alignItems: "center", justifyContent: "center" },
+  donutLabel: { position: "absolute", fontSize: 13, fontWeight: "900", color: "#1a2540" },
+  progressBar: { height: 6, backgroundColor: "#e0e0e0", borderRadius: 4, marginBottom: 6 },
+  progressFill: { height: 6, backgroundColor: "#2e7de1", borderRadius: 4 },
+  progressText: { fontSize: 11, color: "#7a8099", marginBottom: 16 },
+  datesRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f2f3f7",
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 14,
+  },
+  dateBox: { flex: 1, alignItems: "center" },
+  dateLabel: { fontSize: 11, color: "#7a8099", marginBottom: 4 },
+  dateValue: { fontSize: 14, fontWeight: "800", color: "#1a2540" },
+  dateDivider: { width: 1, height: 32, backgroundColor: "#dde0ea" },
+  descBox: { backgroundColor: "#f2f3f7", borderRadius: 12, padding: 14, marginBottom: 14 },
+  sectionLabel: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#7a8099",
+    marginBottom: 6,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  descText: { fontSize: 13, color: "#1a2540", lineHeight: 19 },
+  membersSection: { marginBottom: 14 },
+  membersRow: { flexDirection: "row", marginTop: 8 },
+  memberAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#1e5fc2",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#fff",
+  },
+  memberAvatarText: { color: "#fff", fontSize: 11, fontWeight: "800" },
+  closeBtn: {
+    backgroundColor: "#1a2540",
+    borderRadius: 10,
+    paddingVertical: 13,
+    alignItems: "center",
+    marginTop: 4,
+  },
+  closeBtnText: { color: "#fff", fontSize: 15, fontWeight: "800" },
+});
+
 export default function Projetos() {
   const { abrirTodos } = useLocalSearchParams<{ abrirTodos?: string }>();
   const { projects, addProject } = useProjects();
   const [modalVerTodos, setModalVerTodos] = useState(false);
   const [modalAdicionar, setModalAdicionar] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
@@ -133,7 +314,12 @@ export default function Projetos() {
             </View>
           ) : (
             projects.map((p) => (
-              <View key={p.id} style={styles.projectRow}>
+              <TouchableOpacity
+                key={p.id}
+                style={styles.projectRow}
+                onPress={() => setSelectedProject(p as Project)}
+                activeOpacity={0.75}
+              >
                 <View style={styles.donutWrap}>
                   <DonutChart percent={p.progress} />
                   <Text style={styles.donutLabel}>{p.progress}%</Text>
@@ -147,7 +333,7 @@ export default function Projetos() {
                     />
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))
           )}
         </View>
@@ -169,6 +355,13 @@ export default function Projetos() {
         <Text style={styles.fabIcon}>+</Text>
       </TouchableOpacity>
 
+      {/* Pop-up detalhe do projeto */}
+      <ProjectDetailModal
+        project={selectedProject}
+        visible={!!selectedProject}
+        onClose={() => setSelectedProject(null)}
+      />
+
       {/* Modal: Ver todos (grid) */}
       <Modal visible={modalVerTodos} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
@@ -188,7 +381,15 @@ export default function Projetos() {
             <ScrollView showsVerticalScrollIndicator={false}>
               <View style={styles.grid}>
                 {projects.map((p) => (
-                  <View key={p.id} style={styles.gridCard}>
+                  <TouchableOpacity
+                    key={p.id}
+                    style={styles.gridCard}
+                    onPress={() => {
+                      setModalVerTodos(false);
+                      setSelectedProject(p as Project);
+                    }}
+                    activeOpacity={0.75}
+                  >
                     <Text style={styles.gridName}>{p.name}</Text>
                     <View style={styles.gridDonutWrap}>
                       <DonutChart percent={p.progress} size={80} />
@@ -211,7 +412,7 @@ export default function Projetos() {
                         </View>
                       ))}
                     </View>
-                  </View>
+                  </TouchableOpacity>
                 ))}
                 {/* Card de adicionar no grid */}
                 <TouchableOpacity
