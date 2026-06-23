@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, ScrollView, SafeAreaView,
+  StyleSheet, ScrollView, SafeAreaView, Modal,
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { router } from 'expo-router';
@@ -9,9 +9,20 @@ import { useAuth } from '../../context/AuthContext';
 import { useProjects } from '../../context/ProjectContext';
 import { useTasks } from '../../context/TaskContext';
 
+// ─── Tipo Project ─────────────────────────────────────────────────────────────
+type Project = {
+  id: string;
+  name: string;
+  description?: string;
+  manager: string;
+  startDate: string;
+  endDate: string;
+  progress: number;
+  members: string[];
+};
+
 // ─── Donut Chart ────────────────────────────────────────────────────────────
-function DonutChart({ percent }: { percent: number }) {
-  const size = 90;
+function DonutChart({ percent, size = 90 }: { percent: number; size?: number }) {
   const strokeWidth = 10;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -54,12 +65,141 @@ function getDayLabel(date: Date) {
   return `${diff}d atrás`;
 }
 
+// ─── Modal de detalhes do projeto ────────────────────────────────────────────
+function ProjectDetailModal({
+  project,
+  visible,
+  onClose,
+}: {
+  project: Project | null;
+  visible: boolean;
+  onClose: () => void;
+}) {
+  if (!project) return null;
+
+  return (
+    <Modal visible={visible} animationType="fade" transparent>
+      <TouchableOpacity style={detailStyles.overlay} activeOpacity={1} onPress={onClose}>
+        <TouchableOpacity style={detailStyles.card} activeOpacity={1} onPress={() => {}}>
+          <View style={detailStyles.topBar}>
+            <View style={detailStyles.topInfo}>
+              <Text style={detailStyles.projectName}>{project.name}</Text>
+              <Text style={detailStyles.managerLabel}>GP · {project.manager}</Text>
+            </View>
+            <View style={detailStyles.donutWrap}>
+              <DonutChart percent={project.progress} size={72} />
+              <Text style={detailStyles.donutLabel}>{project.progress}%</Text>
+            </View>
+          </View>
+
+          <View style={detailStyles.progressBar}>
+            <View style={[detailStyles.progressFill, { width: `${project.progress}%` }]} />
+          </View>
+          <Text style={detailStyles.progressText}>{project.progress}% concluído</Text>
+
+          <View style={detailStyles.datesRow}>
+            <View style={detailStyles.dateBox}>
+              <Text style={detailStyles.dateLabel}>Início</Text>
+              <Text style={detailStyles.dateValue}>{project.startDate}</Text>
+            </View>
+            <View style={detailStyles.dateDivider} />
+            <View style={detailStyles.dateBox}>
+              <Text style={detailStyles.dateLabel}>Entrega</Text>
+              <Text style={detailStyles.dateValue}>{project.endDate}</Text>
+            </View>
+          </View>
+
+          {!!project.description && (
+            <View style={detailStyles.descBox}>
+              <Text style={detailStyles.sectionLabel}>Descrição</Text>
+              <Text style={detailStyles.descText}>{project.description}</Text>
+            </View>
+          )}
+
+          {project.members && project.members.length > 0 && (
+            <View style={detailStyles.membersSection}>
+              <Text style={detailStyles.sectionLabel}>Membros</Text>
+              <View style={detailStyles.membersRow}>
+                {project.members.map((m, i) => (
+                  <View key={i} style={[detailStyles.memberAvatar, { marginLeft: i > 0 ? -8 : 0 }]}>
+                    <Text style={detailStyles.memberAvatarText}>{getInitials(m)}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          <TouchableOpacity style={detailStyles.closeBtn} onPress={onClose}>
+            <Text style={detailStyles.closeBtnText}>Fechar</Text>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </TouchableOpacity>
+    </Modal>
+  );
+}
+
+const detailStyles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  card: {
+    width: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  topBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
+  topInfo: { flex: 1, paddingRight: 12 },
+  projectName: { fontSize: 18, fontWeight: '900', color: '#1a2540', marginBottom: 4 },
+  managerLabel: { fontSize: 13, color: '#7a8099' },
+  donutWrap: { position: 'relative', alignItems: 'center', justifyContent: 'center' },
+  donutLabel: { position: 'absolute', fontSize: 13, fontWeight: '900', color: '#1a2540' },
+  progressBar: { height: 6, backgroundColor: '#e0e0e0', borderRadius: 4, marginBottom: 6 },
+  progressFill: { height: 6, backgroundColor: '#2e7de1', borderRadius: 4 },
+  progressText: { fontSize: 11, color: '#7a8099', marginBottom: 16 },
+  datesRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f2f3f7',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 14,
+  },
+  dateBox: { flex: 1, alignItems: 'center' },
+  dateLabel: { fontSize: 11, color: '#7a8099', marginBottom: 4 },
+  dateValue: { fontSize: 14, fontWeight: '800', color: '#1a2540' },
+  dateDivider: { width: 1, height: 32, backgroundColor: '#dde0ea' },
+  descBox: { backgroundColor: '#f2f3f7', borderRadius: 12, padding: 14, marginBottom: 14 },
+  sectionLabel: { fontSize: 11, fontWeight: '700', color: '#7a8099', marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 },
+  descText: { fontSize: 13, color: '#1a2540', lineHeight: 19 },
+  membersSection: { marginBottom: 14 },
+  membersRow: { flexDirection: 'row', marginTop: 8 },
+  memberAvatar: {
+    width: 32, height: 32, borderRadius: 16,
+    backgroundColor: '#1e5fc2',
+    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 2, borderColor: '#fff',
+  },
+  memberAvatarText: { color: '#fff', fontSize: 11, fontWeight: '800' },
+  closeBtn: { backgroundColor: '#1a2540', borderRadius: 10, paddingVertical: 13, alignItems: 'center', marginTop: 4 },
+  closeBtnText: { color: '#fff', fontSize: 15, fontWeight: '800' },
+});
+
 // ─── Tela ───────────────────────────────────────────────────────────────────
 export default function Home() {
   const { user } = useAuth();
   const { projects } = useProjects();
   const { getRecentTasks } = useTasks();
   const [search, setSearch] = useState('');
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const firstName = user?.name?.split(' ')[0] ?? 'usuário';
   const recentTasks = getRecentTasks(3);
@@ -128,14 +268,19 @@ export default function Home() {
         ) : (
           <View style={styles.projectsRow}>
             {displayProjects.map(p => (
-              <View key={p.id} style={styles.projectCard}>
+              <TouchableOpacity
+                key={p.id}
+                style={styles.projectCard}
+                onPress={() => setSelectedProject(p as Project)}
+                activeOpacity={0.75}
+              >
                 <View style={styles.donutWrap}>
                   <DonutChart percent={p.progress} />
                   <Text style={styles.donutLabel}>{p.progress}%</Text>
                 </View>
                 <Text style={styles.projectName} numberOfLines={1}>{p.name.toUpperCase()}</Text>
                 <Text style={styles.projectSub}>{p.progress}% COMPLETO</Text>
-              </View>
+              </TouchableOpacity>
             ))}
           </View>
         )}
@@ -180,6 +325,11 @@ export default function Home() {
         </View>
 
       </ScrollView>
+      <ProjectDetailModal
+        project={selectedProject}
+        visible={!!selectedProject}
+        onClose={() => setSelectedProject(null)}
+      />
     </SafeAreaView>
   );
 }
