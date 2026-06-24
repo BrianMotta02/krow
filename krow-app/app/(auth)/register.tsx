@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
+import { Logo } from '../../components/logo';
 export default function Register() {
   const router = useRouter();
   const { register } = useAuth();
@@ -87,10 +88,7 @@ export default function Register() {
           </TouchableOpacity>
         </View>
         <View style={styles.logoArea}>
-          <View style={styles.logoBox}>
-            <Text style={styles.logoChar}>K</Text>
-          </View>
-          <Text style={styles.logoText}>KROW</Text>
+          <Logo height={48} />
         </View>
         <Text style={styles.title}>Bem vindo ao Cadastro</Text>
         <Text style={styles.sub}>
@@ -178,26 +176,6 @@ const styles = StyleSheet.create({
   logoArea: {
     alignItems: 'center',
     marginBottom: 16,
-  },
-  logoBox: {
-    width: 52,
-    height: 52,
-    borderRadius: 13,
-    backgroundColor: '#1e5fc2',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 6,
-  },
-  logoChar: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: '900',
-  },
-  logoText: {
-    fontSize: 14,
-    fontWeight: '900',
-    letterSpacing: 3,
-    color: '#1a2540',
   },
   title: {
     fontSize: 22,

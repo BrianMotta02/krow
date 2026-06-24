@@ -14,6 +14,7 @@ import Svg, { Circle } from "react-native-svg";
 import { useLocalSearchParams } from "expo-router";
 import { useProjects } from "../../context/ProjectContext";
 import { maskDate } from "../utils/masks";
+import { Logo } from "../../components/logo";
 
 function DonutChart({
   percent,
@@ -288,10 +289,7 @@ export default function Projetos() {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLogo}>
-            <View style={styles.logoBox}>
-              <Text style={styles.logoChar}>K</Text>
-            </View>
-            <Text style={styles.logoText}>KROW</Text>
+            <Logo height={38} />
           </View>
         </View>
 
@@ -340,10 +338,7 @@ export default function Projetos() {
 
         {/* Footer */}
         <View style={styles.footerLogo}>
-          <View style={styles.logoBox}>
-            <Text style={styles.logoChar}>K</Text>
-          </View>
-          <Text style={styles.logoText}>KROW</Text>
+          <Logo height={28} />
         </View>
       </ScrollView>
 
@@ -371,10 +366,7 @@ export default function Projetos() {
                 <Text style={styles.backIcon}>←</Text>
               </TouchableOpacity>
               <View style={styles.headerLogo}>
-                <View style={styles.logoBox}>
-                  <Text style={styles.logoChar}>K</Text>
-                </View>
-                <Text style={styles.logoText}>KROW</Text>
+                <Logo height={38} />
               </View>
             </View>
 
@@ -439,10 +431,7 @@ export default function Projetos() {
                 <Text style={styles.backIcon}>←</Text>
               </TouchableOpacity>
               <View style={styles.headerLogo}>
-                <View style={styles.logoBox}>
-                  <Text style={styles.logoChar}>K</Text>
-                </View>
-                <Text style={styles.logoText}>KROW</Text>
+                <Logo height={38} />
               </View>
             </View>
 
@@ -515,21 +504,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   headerLogo: { flexDirection: "row", alignItems: "center", gap: 8 },
-  logoBox: {
-    width: 36,
-    height: 36,
-    borderRadius: 9,
-    backgroundColor: "#1e5fc2",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  logoChar: { color: "#fff", fontSize: 16, fontWeight: "900" },
-  logoText: {
-    fontSize: 16,
-    fontWeight: "900",
-    letterSpacing: 2,
-    color: "#1a2540",
-  },
   btnVerTodos: {
     backgroundColor: "#2e7de1",
     borderRadius: 10,

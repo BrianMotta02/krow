@@ -8,6 +8,7 @@ import { router } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import { useProjects } from '../../context/ProjectContext';
 import { useTasks, TaskPriority } from '../../context/TaskContext';
+import { Logo } from '../../components/logo';
 
 // ─── Donut Chart ────────────────────────────────────────────────────────────
 function DonutChart({ percent, size = 90 }: { percent: number; size?: number }) {
@@ -329,6 +330,105 @@ const tStyles = StyleSheet.create({
   input: { backgroundColor: '#fff', borderRadius: 10, borderWidth: 1.5, borderColor: '#dde0ea', paddingHorizontal: 16, paddingVertical: 13, fontSize: 14, color: '#1a2540' },
 });
 
+// ─── Notificações (exemplo) ───────────────────────────────────────────────
+type Notification = {
+  id: string;
+  title: string;
+  description: string;
+  time: string;
+  read: boolean;
+};
+
+const EXAMPLE_NOTIFICATIONS: Notification[] = [
+  { id: '1', title: 'Nova tarefa atribuída', description: 'Você recebeu a tarefa "Atualização do Sistema de Design".', time: 'Há 2h', read: false },
+  { id: '2', title: 'Comentário no projeto', description: 'Carlos Eduardo comentou em "La Bolaria".', time: 'Há 5h', read: false },
+  { id: '3', title: 'Prazo se aproximando', description: 'A tarefa "Homologação e Controle de Qualidade (QA)" vence em breve.', time: 'Ontem', read: false },
+];
+
+function NotificationsModal({
+  visible,
+  onClose,
+  notifications,
+  onMarkRead,
+  onDelete,
+}: {
+  visible: boolean;
+  onClose: () => void;
+  notifications: Notification[];
+  onMarkRead: (id: string) => void;
+  onDelete: (id: string) => void;
+}) {
+  return (
+    <Modal visible={visible} animationType="fade" transparent>
+      <TouchableOpacity style={nStyles.overlay} activeOpacity={1} onPress={onClose}>
+        <TouchableOpacity style={nStyles.card} activeOpacity={1} onPress={() => {}}>
+          <View style={nStyles.header}>
+            <Text style={nStyles.headerTitle}>Notificações</Text>
+            <TouchableOpacity onPress={onClose}>
+              <Text style={nStyles.closeIcon}>✕</Text>
+            </TouchableOpacity>
+          </View>
+
+          {notifications.length === 0 ? (
+            <View style={nStyles.emptyBox}>
+              <Text style={nStyles.emptyIcon}>🔔</Text>
+              <Text style={nStyles.emptyTitle}>Nenhuma notificação</Text>
+              <Text style={nStyles.emptyText}>Você está em dia! Avisaremos por aqui quando algo novo acontecer.</Text>
+            </View>
+          ) : (
+            <ScrollView style={{ maxHeight: 360 }} showsVerticalScrollIndicator={false}>
+              {notifications.map(n => (
+                <TouchableOpacity
+                  key={n.id}
+                  style={nStyles.notifCard}
+                  activeOpacity={0.7}
+                  onPress={() => !n.read && onMarkRead(n.id)}
+                >
+                  <View style={[nStyles.notifDot, !n.read && nStyles.notifDotUnread]} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={nStyles.notifTitle}>{n.title}</Text>
+                    <Text style={nStyles.notifDescription}>{n.description}</Text>
+                    <Text style={nStyles.notifTime}>{n.time}</Text>
+                  </View>
+                  <TouchableOpacity style={nStyles.deleteBtn} onPress={() => onDelete(n.id)}>
+                    <Text style={nStyles.deleteBtnText}>✕</Text>
+                  </TouchableOpacity>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          )}
+
+          <TouchableOpacity style={nStyles.closeBtn} onPress={onClose}>
+            <Text style={nStyles.closeBtnText}>Fechar</Text>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </TouchableOpacity>
+    </Modal>
+  );
+}
+
+const nStyles = StyleSheet.create({
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 },
+  card: { width: '100%', maxWidth: 420, backgroundColor: '#fff', borderRadius: 20, padding: 20, shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 20, elevation: 10 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  headerTitle: { fontSize: 17, fontWeight: '900', color: '#1a2540' },
+  closeIcon: { fontSize: 18, color: '#555' },
+  emptyBox: { alignItems: 'center', paddingVertical: 28 },
+  emptyIcon: { fontSize: 38, marginBottom: 10 },
+  emptyTitle: { fontSize: 15, fontWeight: '800', color: '#1a2540', marginBottom: 6 },
+  emptyText: { fontSize: 13, color: '#7a8099', textAlign: 'center', lineHeight: 18, paddingHorizontal: 10 },
+  notifCard: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#eef0f5' },
+  notifDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#dde0ea', marginTop: 6 },
+  notifDotUnread: { backgroundColor: '#2e7de1' },
+  notifTitle: { fontSize: 13, fontWeight: '800', color: '#1a2540', marginBottom: 2 },
+  notifDescription: { fontSize: 12, color: '#4a5068', lineHeight: 17, marginBottom: 4 },
+  notifTime: { fontSize: 11, color: '#b0b5c8' },
+  deleteBtn: { padding: 4, marginLeft: 4 },
+  deleteBtnText: { fontSize: 13, color: '#b0b5c8', fontWeight: '700' },
+  closeBtn: { backgroundColor: '#1a2540', borderRadius: 10, paddingVertical: 13, alignItems: 'center', marginTop: 14 },
+  closeBtnText: { color: '#fff', fontSize: 15, fontWeight: '800' },
+});
+
 // ─── Tela ───────────────────────────────────────────────────────────────────
 export default function Home() {
   const { user } = useAuth();
@@ -337,6 +437,18 @@ export default function Home() {
   const [search, setSearch] = useState('');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [notificationsVisible, setNotificationsVisible] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>(EXAMPLE_NOTIFICATIONS);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  function handleMarkRead(id: string) {
+    setNotifications(prev => prev.map(n => (n.id === id ? { ...n, read: true } : n)));
+  }
+
+  function handleDeleteNotification(id: string) {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  }
 
   const firstName = user?.name?.split(' ')[0] ?? 'usuário';
   const recentTasks = getRecentTasks(3);
@@ -354,13 +466,15 @@ export default function Home() {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLogo}>
-            <View style={styles.logoBox}>
-              <Text style={styles.logoChar}>K</Text>
-            </View>
-            <Text style={styles.logoText}>KROW</Text>
+            <Logo height={38} />
           </View>
-          <TouchableOpacity style={styles.bellBtn}>
+          <TouchableOpacity style={styles.bellBtn} onPress={() => setNotificationsVisible(true)}>
             <Text style={styles.bellIcon}>🔔</Text>
+            {unreadCount > 0 && (
+              <View style={styles.bellBadge}>
+                <Text style={styles.bellBadgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
+              </View>
+            )}
           </TouchableOpacity>
         </View>
 
@@ -460,10 +574,7 @@ export default function Home() {
 
         {/* Footer */}
         <View style={styles.footerLogo}>
-          <View style={styles.logoBox}>
-            <Text style={styles.logoChar}>K</Text>
-          </View>
-          <Text style={styles.logoText}>KROW</Text>
+          <Logo height={28} />
         </View>
 
       </ScrollView>
@@ -481,6 +592,15 @@ export default function Home() {
         visible={!!selectedTaskId}
         onClose={() => setSelectedTaskId(null)}
       />
+
+      {/* Modal de notificações */}
+      <NotificationsModal
+        visible={notificationsVisible}
+        onClose={() => setNotificationsVisible(false)}
+        notifications={notifications}
+        onMarkRead={handleMarkRead}
+        onDelete={handleDeleteNotification}
+      />
     </SafeAreaView>
   );
 }
@@ -490,11 +610,23 @@ const styles = StyleSheet.create({
   scroll: { paddingHorizontal: 20, paddingBottom: 32 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 16, marginBottom: 20 },
   headerLogo: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  logoBox: { width: 36, height: 36, borderRadius: 9, backgroundColor: '#1e5fc2', alignItems: 'center', justifyContent: 'center' },
-  logoChar: { color: '#fff', fontSize: 16, fontWeight: '900' },
-  logoText: { fontSize: 16, fontWeight: '900', letterSpacing: 2, color: '#1a2540' },
-  bellBtn: { padding: 4 },
+  bellBtn: { padding: 4, position: 'relative' },
   bellIcon: { fontSize: 22 },
+  bellBadge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    backgroundColor: '#ef4444',
+    borderRadius: 9,
+    minWidth: 18,
+    height: 18,
+    paddingHorizontal: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: '#f2f3f7',
+  },
+  bellBadgeText: { color: '#fff', fontSize: 10, fontWeight: '900' },
   greeting: { fontSize: 22, fontWeight: '700', color: '#1a2540', marginBottom: 16 },
   greetingName: { fontWeight: '900' },
   searchBox: { backgroundColor: '#fff', borderRadius: 12, borderWidth: 1.5, borderColor: '#dde0ea', marginBottom: 20 },

@@ -5,6 +5,7 @@ import {
   Platform, ScrollView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Logo } from '../../components/logo';
 
 export default function ForgotPassword() {
   const router = useRouter();
@@ -37,10 +38,7 @@ export default function ForgotPassword() {
         </View>
 
         <View style={styles.logoArea}>
-          <View style={styles.logoBox}>
-            <Text style={styles.logoChar}>K</Text>
-          </View>
-          <Text style={styles.logoText}>KROW</Text>
+          <Logo height={48} />
         </View>
 
         <Text style={styles.title}>Esqueceu sua senha?</Text>
@@ -67,10 +65,7 @@ export default function ForgotPassword() {
         </TouchableOpacity>
 
         <View style={styles.footer}>
-          <View style={styles.logoBox}>
-            <Text style={styles.logoChar}>K</Text>
-          </View>
-          <Text style={styles.logoText}>KROW</Text>
+          <Logo height={36} />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -83,13 +78,6 @@ const styles = StyleSheet.create({
   topBar: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 70 },
   navIcon: { fontSize: 22, color: '#555' },
   logoArea: { alignItems: 'center', marginBottom: 16 },
-  logoBox: {
-    width: 52, height: 52, borderRadius: 13,
-    backgroundColor: '#1e5fc2',
-    alignItems: 'center', justifyContent: 'center', marginBottom: 6,
-  },
-  logoChar: { color: '#fff', fontSize: 24, fontWeight: '900' },
-  logoText: { fontSize: 14, fontWeight: '900', letterSpacing: 3, color: '#1a2540' },
   title: { fontSize: 22, fontWeight: '900', color: '#1a2540', textAlign: 'center', marginBottom: 4 },
   sub: { fontSize: 12, color: '#7a8099', textAlign: 'center', marginBottom: 16 },
   descBox: {

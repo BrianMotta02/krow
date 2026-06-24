@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  StyleSheet, 
-  SafeAreaView, 
-  Alert, 
-  Image, 
+import React, { useState, useRef } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  Alert,
+  Image,
   ScrollView,
   KeyboardAvoidingView,
-  Platform 
+  Platform,
+  Animated,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../../context/AuthContext';
@@ -23,9 +24,13 @@ export default function EditarConta() {
 
   const [nome, setNome] = useState(user?.name ?? '');
   const [funcao, setFuncao] = useState(user?.role ?? '');
-  const [email, setEmail] = useState(user?.email ?? '');
   const [fone, setFone] = useState(user?.phone ?? '');
   const [foto, setFoto] = useState<string | null>(user?.avatar ?? null);
+
+  // ── Animação de sucesso no botão Confirmar ─────────────────────────────
+  const [isSuccess, setIsSuccess] = useState(false);
+  const btnColorAnim = useRef(new Animated.Value(0)).current;
+  const btnScaleAnim = useRef(new Animated.Value(1)).current;
 
   async function handleAlterarFoto() {
     try {
@@ -45,36 +50,52 @@ export default function EditarConta() {
   }
 
   function handleConfirmar() {
-    if (!nome.trim() || !email.trim()) {
-      Alert.alert('Atenção', 'Nome e E-mail não podem ficar vazios.');
+    if (!nome.trim()) {
+      Alert.alert('Atenção', 'Nome não pode ficar vazio.');
       return;
     }
 
     updateUser({
       name: nome.trim(),
       role: funcao.trim(),
-      email: email.trim(),
+      email: user?.email ?? '',
       phone: fone.trim(),
       avatar: foto,
     });
 
-    Alert.alert('Sucesso', 'Conta atualizada com sucesso!', [
-      { text: 'OK', onPress: () => router.back() }
-    ]);
+    setIsSuccess(true);
+    Animated.sequence([
+      Animated.timing(btnScaleAnim, { toValue: 1.06, duration: 140, useNativeDriver: true }),
+      Animated.timing(btnScaleAnim, { toValue: 1, duration: 140, useNativeDriver: true }),
+    ]).start();
+    Animated.timing(btnColorAnim, {
+      toValue: 1,
+      duration: 250,
+      useNativeDriver: false,
+    }).start(() => {
+      setTimeout(() => {
+        router.back();
+      }, 600);
+    });
   }
 
   function getInitials(nameStr: string) {
     return nameStr.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
   }
 
+  const btnBackgroundColor = btnColorAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['#0000ff', '#22c55e'],
+  });
+
   return (
     <SafeAreaView style={styles.safe}>
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined} 
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1 }}
       >
         <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-          
+
           <View style={styles.header}>
             <TouchableOpacity onPress={() => router.back()} style={styles.backCircleBtn}>
               <Ionicons name="arrow-back" size={20} color="#fff" />
@@ -82,7 +103,7 @@ export default function EditarConta() {
           </View>
 
           <View style={styles.mainCard}>
-            
+
             <View style={styles.avatarArea}>
               <TouchableOpacity onPress={handleAlterarFoto} activeOpacity={0.8}>
                 {foto ? (
@@ -102,9 +123,9 @@ export default function EditarConta() {
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Nome:</Text>
               <View style={styles.inputBox}>
-                <TextInput 
-                  style={styles.input} 
-                  value={nome} 
+                <TextInput
+                  style={styles.input}
+                  value={nome}
                   onChangeText={setNome}
                   placeholder="Digite seu nome"
                 />
@@ -116,9 +137,9 @@ export default function EditarConta() {
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Função</Text>
               <View style={styles.inputBox}>
-                <TextInput 
-                  style={styles.input} 
-                  value={funcao} 
+                <TextInput
+                  style={styles.input}
+                  value={funcao}
                   onChangeText={setFuncao}
                   placeholder="Sua função"
                 />
@@ -129,14 +150,12 @@ export default function EditarConta() {
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>E-mail</Text>
-              <View style={styles.inputBox}>
-                <TextInput 
-                  style={styles.input} 
-                  value={email} 
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  placeholder="exemplo@krow.com.br"
+              <View style={[styles.inputBox, { backgroundColor: '#f0f0f4' }]}>
+                <TextInput
+                  style={[styles.input, { color: '#888' }]}
+                  value={user?.email ?? ''}
+                  editable={false}
+                  selectTextOnFocus={false}
                 />
               </View>
             </View>
@@ -146,9 +165,9 @@ export default function EditarConta() {
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Fone</Text>
               <View style={styles.inputBox}>
-                <TextInput 
-                  style={styles.input} 
-                  value={fone} 
+                <TextInput
+                  style={styles.input}
+                  value={fone}
                   onChangeText={setFone}
                   keyboardType="phone-pad"
                   placeholder="+55 (00) 00000-0000"
@@ -156,9 +175,30 @@ export default function EditarConta() {
               </View>
             </View>
 
-            <TouchableOpacity style={styles.btnConfirmar} onPress={handleConfirmar}>
-              <Text style={styles.btnConfirmarText}>Confirmar</Text>
-            </TouchableOpacity>
+            <Animated.View style={{ width: '65%', alignSelf: 'center', marginTop: 28, transform: [{ scale: btnScaleAnim }] }}>
+              <Animated.View
+                style={[
+                  styles.btnConfirmar,
+                  { backgroundColor: btnBackgroundColor },
+                ]}
+              >
+                <TouchableOpacity
+                  style={styles.btnConfirmarTouchable}
+                  onPress={handleConfirmar}
+                  disabled={isSuccess}
+                  activeOpacity={0.85}
+                >
+                  {isSuccess ? (
+                    <View style={styles.successRow}>
+                      <Ionicons name="checkmark-circle" size={18} color="#fff" />
+                      <Text style={styles.btnConfirmarText}>Salvo!</Text>
+                    </View>
+                  ) : (
+                    <Text style={styles.btnConfirmarText}>Confirmar</Text>
+                  )}
+                </TouchableOpacity>
+              </Animated.View>
+            </Animated.View>
 
           </View>
         </ScrollView>
@@ -183,6 +223,8 @@ const styles = StyleSheet.create({
   inputBox: { borderWidth: 1.5, borderColor: '#7a8099', borderRadius: 20, paddingHorizontal: 16, paddingVertical: 10, backgroundColor: '#fff' },
   input: { fontSize: 13, color: '#1a2540', fontWeight: '600' },
   blueLine: { height: 3, backgroundColor: '#0000ff', width: '65%', alignSelf: 'center', marginVertical: 12, borderRadius: 2 },
-  btnConfirmar: { backgroundColor: '#0000ff', borderRadius: 12, paddingVertical: 14, width: '65%', alignSelf: 'center', marginTop: 28, alignItems: 'center' },
-  btnConfirmarText: { color: '#fff', fontSize: 15, fontWeight: '800' }
+  btnConfirmar: { borderRadius: 12, overflow: 'hidden' },
+  btnConfirmarTouchable: { paddingVertical: 14, alignItems: 'center', justifyContent: 'center' },
+  successRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  btnConfirmarText: { color: '#fff', fontSize: 15, fontWeight: '800' },
 });

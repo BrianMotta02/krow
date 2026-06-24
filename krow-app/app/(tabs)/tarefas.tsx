@@ -15,6 +15,7 @@ import { useTasks, Task, TaskPriority } from "../../context/TaskContext";
 import { useProjects } from "../../context/ProjectContext";
 import { useAuth } from "../../context/AuthContext";
 import { maskDate } from "../utils/masks";
+import { Logo } from "../../components/logo";
 
 const PRIORITY_COLORS: Record<TaskPriority, string> = {
   alta: "#ef4444",
@@ -142,10 +143,7 @@ export default function Tarefas() {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLogo}>
-            <View style={styles.logoBox}>
-              <Text style={styles.logoChar}>K</Text>
-            </View>
-            <Text style={styles.logoText}>KROW</Text>
+            <Logo height={38} />
           </View>
         </View>
 
@@ -206,10 +204,7 @@ export default function Tarefas() {
         </View>
 
         <View style={styles.footerLogo}>
-          <View style={styles.logoBox}>
-            <Text style={styles.logoChar}>K</Text>
-          </View>
-          <Text style={styles.logoText}>KROW</Text>
+          <Logo height={28} />
         </View>
       </ScrollView>
 
@@ -540,21 +535,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   headerLogo: { flexDirection: "row", alignItems: "center", gap: 8 },
-  logoBox: {
-    width: 36,
-    height: 36,
-    borderRadius: 9,
-    backgroundColor: "#1e5fc2",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  logoChar: { color: "#fff", fontSize: 16, fontWeight: "900" },
-  logoText: {
-    fontSize: 16,
-    fontWeight: "900",
-    letterSpacing: 2,
-    color: "#1a2540",
-  },
   pageTitle: {
     fontSize: 20,
     fontWeight: "900",
