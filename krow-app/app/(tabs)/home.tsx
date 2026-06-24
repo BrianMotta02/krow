@@ -8,6 +8,7 @@ import { router } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import { useProjects } from '../../context/ProjectContext';
 import { useTasks, TaskPriority } from '../../context/TaskContext';
+import { Logo } from '../../components/logo';
 
 // ─── Donut Chart ────────────────────────────────────────────────────────────
 function DonutChart({ percent, size = 90 }: { percent: number; size?: number }) {
@@ -465,10 +466,7 @@ export default function Home() {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLogo}>
-            <View style={styles.logoBox}>
-              <Text style={styles.logoChar}>K</Text>
-            </View>
-            <Text style={styles.logoText}>KROW</Text>
+            <Logo height={38} />
           </View>
           <TouchableOpacity style={styles.bellBtn} onPress={() => setNotificationsVisible(true)}>
             <Text style={styles.bellIcon}>🔔</Text>
@@ -576,10 +574,7 @@ export default function Home() {
 
         {/* Footer */}
         <View style={styles.footerLogo}>
-          <View style={styles.logoBox}>
-            <Text style={styles.logoChar}>K</Text>
-          </View>
-          <Text style={styles.logoText}>KROW</Text>
+          <Logo height={28} />
         </View>
 
       </ScrollView>
@@ -615,9 +610,6 @@ const styles = StyleSheet.create({
   scroll: { paddingHorizontal: 20, paddingBottom: 32 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 16, marginBottom: 20 },
   headerLogo: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  logoBox: { width: 36, height: 36, borderRadius: 9, backgroundColor: '#1e5fc2', alignItems: 'center', justifyContent: 'center' },
-  logoChar: { color: '#fff', fontSize: 16, fontWeight: '900' },
-  logoText: { fontSize: 16, fontWeight: '900', letterSpacing: 2, color: '#1a2540' },
   bellBtn: { padding: 4, position: 'relative' },
   bellIcon: { fontSize: 22 },
   bellBadge: {
