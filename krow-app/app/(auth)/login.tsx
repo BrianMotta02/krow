@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
+import { Logo } from '../../components/logo';
 
 export default function Login() {
   const router = useRouter();
@@ -36,10 +37,7 @@ export default function Login() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.logoArea}>
-          <View style={styles.logoBox}>
-            <Text style={styles.logoChar}>K</Text>
-          </View>
-          <Text style={styles.logoText}>KROW</Text>
+          <Logo height={64} />
         </View>
 
         <Text style={styles.welcome}>Seja bem vindo!</Text>
@@ -88,13 +86,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28, paddingVertical: 40,
   },
   logoArea: { alignItems: 'center', marginBottom: 32 },
-  logoBox: {
-    width: 72, height: 72, borderRadius: 18,
-    backgroundColor: '#1e5fc2',
-    alignItems: 'center', justifyContent: 'center', marginBottom: 10,
-  },
-  logoChar: { color: '#fff', fontSize: 32, fontWeight: '900' },
-  logoText: { fontSize: 22, fontWeight: '900', letterSpacing: 4, color: '#1a2540' },
   welcome: {
     fontSize: 26, fontWeight: '900', color: '#1a2540',
     textAlign: 'center', marginBottom: 28,
